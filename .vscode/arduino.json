@@ -1,0 +1,6 @@
+{
+    "configuration": "PartitionScheme=default,UploadSpeed=1500000,DebugLevel=none",
+    "board": "m5stack:esp32:m5stack-atom",
+    "port": "/dev/cu.usbserial-1552CEEB83",
+    "sketch": "ble_hid.ino"
+}
