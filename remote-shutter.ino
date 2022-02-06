@@ -1,5 +1,7 @@
 #include <M5Atom.h>
-#include <BleKeyboard.h>
+
+#define USE_NIMBLE
+#include "./src/ESP32-BLE-Keyboard/BleKeyboard.h"
 
 // SETTINGS
 #define DEVICE_NAME "M5Keyboard"
