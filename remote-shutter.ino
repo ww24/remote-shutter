@@ -1,6 +1,5 @@
 #include <M5Atom.h>
 
-#define USE_NIMBLE
 #include "./src/ESP32-BLE-Keyboard/BleKeyboard.h"
 
 // SETTINGS
@@ -25,6 +24,7 @@ void setup()
 }
 
 bool connected = false;
+unsigned long last_sent_ms;
 
 void loop()
 {
@@ -41,6 +41,14 @@ void loop()
     {
       Serial.println("Sending key...");
       bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+      last_sent_ms = millis();
+    }
+    else if (millis() - last_sent_ms > 5000) // about 5 seconds after from last sent
+    {
+      Serial.println("Keep display on");
+      // enter a harmless key on Android/iOS because keep display on from going to sleep
+      bleKeyboard.write(KEY_MEDIA_LOCAL_MACHINE_BROWSER);
+      last_sent_ms = millis();
     }
   }
   else if (connected)
