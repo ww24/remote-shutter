@@ -1,6 +1,6 @@
 #include <M5Atom.h>
 
-#include "./src/ESP32-BLE-Keyboard/BleKeyboard.h"
+#include "../lib/ESP32-BLE-Keyboard/BleKeyboard.h"
 
 // SETTINGS
 #define DEVICE_NAME "M5Keyboard"
