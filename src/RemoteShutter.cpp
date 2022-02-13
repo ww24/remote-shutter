@@ -33,3 +33,19 @@ bool RemoteShutter::wasDisconnected(void) {
   }
   return false;
 }
+
+void RemoteShutter::setOnConnect(std::function<void()> handler) {
+  on_connect = handler;
+}
+
+void RemoteShutter::setOnDisconnect(std::function<void()> handler) {
+  on_disconnect = handler;
+}
+
+void RemoteShutter::update(void) {
+  if (wasConnected()) {
+    on_connect();
+  } else if (wasDisconnected()) {
+    on_disconnect();
+  }
+}

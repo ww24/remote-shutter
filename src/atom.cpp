@@ -17,20 +17,23 @@ void setup() {
   Serial.begin(115200);
   Serial.println("started");
 
-  rs.setName(DEVICE_NAME);
-  rs.begin();
-
   M5.dis.clear();
   M5.dis.drawpix(0, disconnectedLED);
+
+  rs.setName(DEVICE_NAME);
+  rs.setOnConnect([] {
+    Serial.println("connected");
+    M5.dis.drawpix(0, connectedLED);
+  });
+  rs.setOnDisconnect([] {
+    Serial.println("disconnected");
+    M5.dis.drawpix(0, disconnectedLED);
+  });
+  rs.begin();
 }
 
 void loop() {
   if (rs.isConnected()) {
-    if (rs.wasConnected()) {
-      Serial.println("connected");
-      M5.dis.drawpix(0, connectedLED);
-    }
-
     if (M5.Btn.wasPressed()) {
       Serial.println("Release the shutter");
       rs.releaseShutter(millis());
@@ -40,13 +43,11 @@ void loop() {
       Serial.println("Keep display on");
       rs.keepDisplayOn(millis());
     }
-  } else if (rs.wasDisconnected()) {
-    Serial.println("disconnected");
-    M5.dis.drawpix(0, disconnectedLED);
   }
 
-  delay(100);
+  rs.update();
   M5.update();
+  delay(100);
 }
 
 #endif  // M5_ATOM
