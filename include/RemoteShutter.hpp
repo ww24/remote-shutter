@@ -3,6 +3,8 @@
 #ifndef INCLUDE_REMOTESHUTTER_HPP_
 #define INCLUDE_REMOTESHUTTER_HPP_
 
+#include <functional>
+
 #include "../lib/ESP32-BLE-Keyboard/BleKeyboard.h"
 
 class RemoteShutter : public BleKeyboard {
@@ -11,6 +13,8 @@ class RemoteShutter : public BleKeyboard {
  private:
   uint64_t last_sent_ms;
   bool conn_state;  // it is true if connected
+  std::function<void()> on_connect = [] {};
+  std::function<void()> on_disconnect = [] {};
 
  public:
   void releaseShutter(uint64_t ms);
@@ -18,6 +22,11 @@ class RemoteShutter : public BleKeyboard {
   uint64_t lastSentDuration(uint64_t ms);
   bool wasConnected(void);
   bool wasDisconnected(void);
+  void setOnConnect(std::function<void()>);
+  void setOnDisconnect(std::function<void()>);
+
+  // should call in loop if use on_connect or on_disconnect handler
+  void update(void);
 };
 
 #endif  // INCLUDE_REMOTESHUTTER_HPP_
