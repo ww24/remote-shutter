@@ -3,7 +3,29 @@
 #include "RemoteShutter.hpp"
 
 void RemoteShutter::releaseShutter(uint64_t ms) {
-  BleKeyboard::write(KEY_MEDIA_VOLUME_DOWN);
+  switch (shutter_mode) {
+    case ShutterMode::Burst:
+      BleKeyboard::press(KEY_MEDIA_VOLUME_DOWN);
+      break;
+
+    default:
+      BleKeyboard::write(KEY_MEDIA_VOLUME_DOWN);
+      break;
+  }
+
+  last_sent_ms = ms;
+}
+
+void RemoteShutter::stopShutter(uint64_t ms) {
+  switch (shutter_mode) {
+    case ShutterMode::Burst:
+      BleKeyboard::release(KEY_MEDIA_VOLUME_DOWN);
+      break;
+
+    default:
+      return;
+  }
+
   last_sent_ms = ms;
 }
 
@@ -49,3 +71,5 @@ void RemoteShutter::update(void) {
     on_disconnect();
   }
 }
+
+void RemoteShutter::setShutterMode(ShutterMode mode) { shutter_mode = mode; }
