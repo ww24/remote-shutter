@@ -111,6 +111,9 @@ std::string Display::getModeName(void) {
     case ShutterMode::Burst:
       return "Burst";
 
+    case ShutterMode::PhotoPro:
+      return "PhotoPro";
+
     default:
       return "unexpected!";
   }

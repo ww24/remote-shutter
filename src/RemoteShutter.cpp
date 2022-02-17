@@ -8,6 +8,10 @@ void RemoteShutter::releaseShutter(uint64_t ms) {
       BleKeyboard::press(KEY_MEDIA_VOLUME_DOWN);
       break;
 
+    case ShutterMode::PhotoPro:
+      BleKeyboard::press(KEY_MEDIA_RECORD);
+      break;
+
     default:
       BleKeyboard::write(KEY_MEDIA_VOLUME_DOWN);
       break;
@@ -20,6 +24,10 @@ void RemoteShutter::stopShutter(uint64_t ms) {
   switch (shutter_mode) {
     case ShutterMode::Burst:
       BleKeyboard::release(KEY_MEDIA_VOLUME_DOWN);
+      break;
+
+    case ShutterMode::PhotoPro:
+      BleKeyboard::release(KEY_MEDIA_RECORD);
       break;
 
     default:
