@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Takenori Nakagawa <ww24gm+oss@gmail.com>
 
-#include "RemoteShutter.hpp"
+#include "../include/RemoteShutter.hpp"
 
 void RemoteShutter::releaseShutter(uint64_t ms) {
   switch (shutter_mode) {

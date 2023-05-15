@@ -3,9 +3,9 @@
 #if defined(M5_STICK_C)
 #include <M5StickCPlus.h>
 
-#include "Display.hpp"
-#include "RemoteShutter.hpp"
-#include "Settings.hpp"
+#include "../include/Display.hpp"
+#include "../include/RemoteShutter.hpp"
+#include "../include/Settings.hpp"
 
 m5util::Display display = m5util::Display(&M5.Lcd, DEVICE_NAME);
 

@@ -3,8 +3,8 @@
 #if defined(M5_ATOM)
 #include <M5Atom.h>
 
-#include "RemoteShutter.hpp"
-#include "Settings.hpp"
+#include "../include/RemoteShutter.hpp"
+#include "../include/Settings.hpp"
 
 RemoteShutter rs;
 
