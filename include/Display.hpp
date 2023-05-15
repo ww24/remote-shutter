@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "RemoteShutter.hpp"
+#include "./RemoteShutter.hpp"
 
 #define HEADER_BAR(offset) (offset * 2 + 15)
 #define FOOTER_BAR 30

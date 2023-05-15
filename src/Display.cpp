@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Takenori Nakagawa <ww24gm+oss@gmail.com>
 
-#include "Display.hpp"
+#include "../include/Display.hpp"
 
 using m5util::Display;
 
@@ -110,6 +110,9 @@ std::string Display::getModeName(void) {
 
     case ShutterMode::Burst:
       return "Burst";
+
+    case ShutterMode::PhotoPro:
+      return "PhotoPro";
 
     default:
       return "unexpected!";

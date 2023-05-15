@@ -7,7 +7,7 @@
 
 #include "../lib/ESP32-BLE-Keyboard/BleKeyboard.h"
 
-enum class ShutterMode { Default, Burst, MAX };
+enum class ShutterMode { Default, Burst, PhotoPro, MAX };
 
 class RemoteShutter : public BleKeyboard {
   using BleKeyboard::BleKeyboard;

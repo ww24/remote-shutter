@@ -1,11 +1,15 @@
 // Copyright (c) 2022 Takenori Nakagawa <ww24gm+oss@gmail.com>
 
-#include "RemoteShutter.hpp"
+#include "../include/RemoteShutter.hpp"
 
 void RemoteShutter::releaseShutter(uint64_t ms) {
   switch (shutter_mode) {
     case ShutterMode::Burst:
       BleKeyboard::press(KEY_MEDIA_VOLUME_DOWN);
+      break;
+
+    case ShutterMode::PhotoPro:
+      BleKeyboard::press(KEY_MEDIA_RECORD);
       break;
 
     default:
@@ -20,6 +24,10 @@ void RemoteShutter::stopShutter(uint64_t ms) {
   switch (shutter_mode) {
     case ShutterMode::Burst:
       BleKeyboard::release(KEY_MEDIA_VOLUME_DOWN);
+      break;
+
+    case ShutterMode::PhotoPro:
+      BleKeyboard::release(KEY_MEDIA_RECORD);
       break;
 
     default:
