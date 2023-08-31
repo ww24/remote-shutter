@@ -4,14 +4,14 @@
 
 using m5util::Display;
 
-Display::Display(M5Display *display, std::string device_name, uint8_t offset,
-                 uint8_t width, uint8_t height)
+Display::Display(M5Display *display, std::string device_name, uint16_t offset,
+                 uint16_t width, uint16_t height)
     : sprite(TFT_eSprite(display)),
       device_name(device_name.substr(0, 15)),
       offset(offset),
       width(width),
       height(height) {
-  sprite.createSprite(TFT_HEIGHT, TFT_WIDTH);
+  sprite.createSprite(height, width);
   sprite.setSwapBytes(true);
 }
 
@@ -27,7 +27,7 @@ void Display::begin(void) {
 }
 
 void Display::disconnected(void) {
-  uint8_t hb = HEADER_BAR(offset);
+  uint16_t hb = HEADER_BAR(offset);
   sprite.fillRect(0, 0, height, width - FOOTER_BAR, TFT_BLACK);
   sprite.fillRect(0, 0, height, hb, sprite.color565(180, 0, 0));
   sprite.setTextSize(2);
@@ -41,7 +41,7 @@ void Display::disconnected(void) {
 }
 
 void Display::connected(void) {
-  uint8_t hb = HEADER_BAR(offset);
+  uint16_t hb = HEADER_BAR(offset);
   sprite.fillRect(0, 0, height, width - FOOTER_BAR, TFT_BLACK);
   sprite.fillRect(0, 0, height, hb, sprite.color565(0, 0, 180));
   sprite.setTextColor(sprite.color565(180, 180, 180));

@@ -19,17 +19,17 @@ class Display {
  private:
   TFT_eSprite sprite;
   std::string device_name;
-  uint8_t offset;
-  uint8_t width;
-  uint8_t height;
+  uint16_t offset;
+  uint16_t width;
+  uint16_t height;
   ShutterMode mode;
   Preferences prefs;
   const std::string pref_name = "remote-shutter";
   const std::string pref_mode_key = "mode";
 
  public:
-  Display(M5Display *display, std::string device_name, uint8_t offset = 10,
-          uint8_t width = TFT_WIDTH, uint8_t height = TFT_HEIGHT);
+  Display(M5Display *display, std::string device_name, uint16_t offset = 10,
+          uint16_t width = TFT_WIDTH, uint16_t height = TFT_HEIGHT);
   ~Display();
   void begin(void);
   void disconnected(void);
