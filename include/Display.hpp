@@ -3,7 +3,7 @@
 #ifndef INCLUDE_DISPLAY_HPP_
 #define INCLUDE_DISPLAY_HPP_
 
-#include <M5StickCPlus.h>
+#include <M5Unified.h>
 #include <Preferences.h>
 
 #include <string>
@@ -17,7 +17,7 @@ namespace m5util {
 
 class Display {
  private:
-  TFT_eSprite sprite;
+  M5Canvas sprite;
   std::string device_name;
   uint16_t offset;
   uint16_t width;
@@ -28,13 +28,13 @@ class Display {
   const std::string pref_mode_key = "mode";
 
  public:
-  Display(M5Display *display, std::string device_name, uint16_t offset = 10,
-          uint16_t width = TFT_WIDTH, uint16_t height = TFT_HEIGHT);
+  Display(M5GFX* display, std::string device_name, uint16_t offset = 10,
+          uint16_t width = 135, uint16_t height = 240);
   ~Display();
   void begin(void);
   void disconnected(void);
   void connected(void);
-  void battery(float volt, float percentage);
+  void battery(float voltage, int32_t current, int32_t percentage);
   void update(void);
   ShutterMode toggleMode(void);
   ShutterMode getMode(void);

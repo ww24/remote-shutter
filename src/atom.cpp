@@ -1,40 +1,50 @@
 // Copyright (c) 2022 Takenori Nakagawa <ww24gm+oss@gmail.com>
 
 #if defined(M5_ATOM)
-#include <M5Atom.h>
+#include <FastLED.h>
+#include <M5Unified.h>
 
 #include "../include/RemoteShutter.hpp"
 #include "../include/Settings.hpp"
 
 RemoteShutter rs;
 
+constexpr uint8_t LED_PIN = 27;
+CRGB leds[1];
+
 const CRGB disconnectedLED = CRGB(128, 0, 0);
 const CRGB connectedLED = CRGB(0, 128, 0);
 
+void setLED(CRGB color) {
+  leds[0] = color;
+  FastLED.show();
+}
+
 void setup() {
-  M5.begin(true, false, true);
+  auto cfg = M5.config();
+  M5.begin(cfg);
 
   Serial.begin(115200);
   Serial.println("started");
 
-  M5.dis.clear();
-  M5.dis.drawpix(0, disconnectedLED);
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, 1);
+  setLED(disconnectedLED);
 
   rs.setName(DEVICE_NAME);
   rs.setOnConnect([] {
     Serial.println("connected");
-    M5.dis.drawpix(0, connectedLED);
+    setLED(connectedLED);
   });
   rs.setOnDisconnect([] {
     Serial.println("disconnected");
-    M5.dis.drawpix(0, disconnectedLED);
+    setLED(disconnectedLED);
   });
   rs.begin();
 }
 
 void loop() {
   if (rs.isConnected()) {
-    if (M5.Btn.wasPressed()) {
+    if (M5.BtnA.wasPressed()) {
       Serial.println("Release the shutter");
       rs.releaseShutter(millis());
     } else if (rs.lastSentDuration(millis()) > 5000) {

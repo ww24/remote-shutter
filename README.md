@@ -5,8 +5,9 @@ Smartphone remote shutter.
 ## Requirements
 
 - M5Stack device
-  - M5Stack ATOM Series (tested in [ATOM Lite](https://docs.m5stack.com/en/core/atom_lite))
-  - [M5StickC PLUS](https://docs.m5stack.com/en/core/m5stickc_plus)
+  - M5Stack ATOM Series (tested in [ATOM Lite](https://docs.m5stack.com/en/core/Atom-Lite))
+  - [M5StickC PLUS](https://docs.m5stack.com/en/core/StickC-Plus)
+  - [M5StickS3](https://docs.m5stack.com/en/core/StickS3)
 - BLE HID (HOGP) supported smartphone with camera
 
 ## Disclaimer

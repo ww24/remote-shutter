@@ -2,11 +2,13 @@
 
 #include "../include/Display.hpp"
 
+#include <string>
+
 using m5util::Display;
 
-Display::Display(M5Display *display, std::string device_name, uint16_t offset,
+Display::Display(M5GFX* display, std::string device_name, uint16_t offset,
                  uint16_t width, uint16_t height)
-    : sprite(TFT_eSprite(display)),
+    : sprite(display),
       device_name(device_name.substr(0, 15)),
       offset(offset),
       width(width),
@@ -56,15 +58,14 @@ void Display::connected(void) {
   sprite.printf("(%s mode)", getModeName().c_str());
 }
 
-void Display::battery(float volt, float percentage) {
+void Display::battery(float voltage, int32_t current, int32_t percentage) {
   sprite.fillRect(0, width - FOOTER_BAR, height, FOOTER_BAR, TFT_BLACK);
   sprite.setTextSize(1);
   sprite.setTextColor(sprite.color565(180, 180, 180));
-  float batVolt = M5.Axp.GetBatVoltage();
   sprite.setCursor(offset, width - offset - 8);
-  sprite.printf("Bat: V/%.3fv I/%.3fma", batVolt, M5.Axp.GetBatCurrent());
+  sprite.printf("Bat: V/%.3fv I/%dma", voltage, current);
 
-  uint32_t btColor;
+  uint16_t btColor;
   if (percentage > 50)
     btColor = TFT_GREEN;
   else if (percentage > 25)
