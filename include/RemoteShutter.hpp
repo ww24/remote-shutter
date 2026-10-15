@@ -3,6 +3,8 @@
 #ifndef INCLUDE_REMOTESHUTTER_HPP_
 #define INCLUDE_REMOTESHUTTER_HPP_
 
+#include <Arduino.h>
+
 #include <functional>
 
 #include "../lib/ESP32-BLE-Keyboard/BleKeyboard.h"
@@ -13,8 +15,8 @@ class RemoteShutter : public BleKeyboard {
   using BleKeyboard::BleKeyboard;
 
  private:
-  uint64_t last_sent_ms;
-  bool conn_state;  // it is true if connected
+  uint64_t last_sent_ms = 0;
+  bool conn_state = false;  // it is true if connected
   std::function<void()> on_connect = [] {};
   std::function<void()> on_disconnect = [] {};
   ShutterMode shutter_mode;

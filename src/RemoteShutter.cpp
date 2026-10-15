@@ -45,12 +45,17 @@ void RemoteShutter::keepDisplayOn(uint64_t ms) {
 }
 
 uint64_t RemoteShutter::lastSentDuration(uint64_t ms) {
+  if (!isConnected()) {
+    last_sent_ms = ms;
+    return 0;
+  }
   return ms - last_sent_ms;
 }
 
 bool RemoteShutter::wasConnected(void) {
   if (isConnected() && !conn_state) {
     conn_state = true;
+    last_sent_ms = millis();
     return true;
   }
   return false;
@@ -59,6 +64,7 @@ bool RemoteShutter::wasConnected(void) {
 bool RemoteShutter::wasDisconnected(void) {
   if (!isConnected() && conn_state) {
     conn_state = false;
+    last_sent_ms = millis();
     return true;
   }
   return false;
