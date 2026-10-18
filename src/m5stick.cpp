@@ -124,6 +124,8 @@ bool updateBattery(uint32_t now, bool force = false) {
 
 void setup() {
   auto cfg = M5.config();
+  cfg.internal_imu = false;
+  cfg.internal_mic = false;
   M5.begin(cfg);
 
   Serial.begin(115200);
@@ -163,11 +165,15 @@ void setup() {
 #endif
     M5.Speaker.tone(880, 50);
     delay(150);
+    M5.Speaker.end();
 #if defined(M5_STICK_C)
     digitalWrite(LED_PIN, HIGH);
 #endif
   });
-  rs.setOnDisconnect([] { Serial.println("disconnected"); });
+  rs.setOnDisconnect([] {
+    Serial.println("disconnected");
+    M5.Speaker.begin();
+  });
   rs.begin();
 
   brightness_active_ms = millis();
