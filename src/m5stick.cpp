@@ -33,12 +33,17 @@ constexpr uint8_t BRIGHTNESS_DIM = 64;
 #endif
 constexpr uint32_t BRIGHTNESS_DIM_TIMEOUT_MS = 10 * 1000;
 
+// auto power off timeouts
+constexpr uint32_t AUTO_POWER_OFF_DISCONNECTED_MS = 60 * 1000;
+constexpr uint32_t AUTO_POWER_OFF_CONNECTED_MS = 5 * 60 * 1000;
+
 // redraw the screen only when something has changed
 bool screen_dirty = true;
 bool last_connected = false;
 
 uint32_t brightness_active_ms = 0;
 bool display_dimmed = false;
+uint32_t last_activity_ms = 0;
 
 uint32_t last_battery_read_ms = 0;
 uint32_t battery_read_interval_ms = 0;  // 0: read on the next call
@@ -59,6 +64,18 @@ void updateBrightness(uint32_t now) {
       now - brightness_active_ms >= BRIGHTNESS_DIM_TIMEOUT_MS) {
     M5.Display.setBrightness(BRIGHTNESS_DIM);
     display_dimmed = true;
+  }
+}
+
+void checkAutoPowerOff(uint32_t now, bool connected) {
+  if (!display.getAutoPowerOff()) {
+    return;
+  }
+  uint32_t timeout_ms =
+      connected ? AUTO_POWER_OFF_CONNECTED_MS : AUTO_POWER_OFF_DISCONNECTED_MS;
+  if (now - last_activity_ms >= timeout_ms) {
+    Serial.println("Auto power off");
+    M5.Power.powerOff();
   }
 }
 
@@ -154,6 +171,7 @@ void setup() {
   rs.begin();
 
   brightness_active_ms = millis();
+  last_activity_ms = brightness_active_ms;
 }
 
 void loop() {
@@ -162,18 +180,28 @@ void loop() {
   if (connected != last_connected) {
     last_connected = connected;
     activateBrightness(now);
+    last_activity_ms = now;
     screen_dirty = true;
   }
 
-  if (M5.BtnB.wasPressed()) {
+  if (M5.BtnA.isPressed() || M5.BtnA.wasPressed() || M5.BtnA.wasReleased()) {
+    last_activity_ms = now;
+  }
+
+  if (M5.BtnB.isPressed() || M5.BtnB.wasPressed() || M5.BtnB.wasReleased()) {
     activateBrightness(now);
-    if (connected) {
-      auto shutter_mode = display.toggleMode();
-      rs.setShutterMode(shutter_mode);
-      Serial.printf("Shutter mode changed: %s\n",
-                    display.getModeName().c_str());
-      screen_dirty = true;
-    }
+    last_activity_ms = now;
+  }
+
+  if (M5.BtnB.wasHold()) {
+    bool enabled = display.toggleAutoPowerOff();
+    Serial.printf("Auto power off: %s\n", enabled ? "ON" : "OFF");
+    screen_dirty = true;
+  } else if (M5.BtnB.wasClicked() && connected) {
+    auto shutter_mode = display.toggleMode();
+    rs.setShutterMode(shutter_mode);
+    Serial.printf("Shutter mode changed: %s\n", display.getModeName().c_str());
+    screen_dirty = true;
   }
 
   if (connected) {
@@ -199,6 +227,7 @@ void loop() {
     M5.Power.powerOff();
   }
 
+  checkAutoPowerOff(now, connected);
   updateBrightness(now);
   updateBattery(now);
 

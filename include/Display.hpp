@@ -23,9 +23,12 @@ class Display {
   uint16_t width;
   uint16_t height;
   ShutterMode mode;
+  bool auto_power_off = true;
   Preferences prefs;
   const std::string pref_name = "remote-shutter";
   const std::string pref_mode_key = "mode";
+  const std::string pref_auto_poff_key = "auto_poff";
+  void drawAutoPowerOffIcon(void);
 
  public:
   Display(M5GFX* display, std::string device_name, uint16_t offset = 10,
@@ -39,6 +42,8 @@ class Display {
   ShutterMode toggleMode(void);
   ShutterMode getMode(void);
   std::string getModeName(void);
+  bool toggleAutoPowerOff(void);
+  bool getAutoPowerOff(void);
 };
 }  // namespace m5util
 
