@@ -26,6 +26,7 @@ void Display::begin(void) {
   }
 
   mode = static_cast<ShutterMode>(prefs.getUChar(pref_mode_key.c_str(), 0));
+  auto_power_off = prefs.getBool(pref_auto_poff_key.c_str(), true);
 }
 
 void Display::disconnected(void) {
@@ -63,7 +64,12 @@ void Display::battery(float voltage, int32_t current, int32_t percentage) {
   sprite.setTextSize(1);
   sprite.setTextColor(sprite.color565(180, 180, 180));
   sprite.setCursor(offset, width - offset - 8);
+#if defined(M5_STICK_S3)
+  (void)current;
+  sprite.printf("Bat: V/%.3fv", voltage);
+#else
   sprite.printf("Bat: V/%.3fv I/%dma", voltage, current);
+#endif
 
   uint16_t btColor;
   if (percentage > 50)
@@ -90,14 +96,34 @@ void Display::battery(float voltage, int32_t current, int32_t percentage) {
                     width - offset - btBarH - 2, btBarW, btBarH, btColor);
 }
 
-void Display::update(void) { sprite.pushSprite(0, 0); }
+void Display::drawAutoPowerOffIcon(void) {
+  int btBarW = 5;
+  int btBarH = 10;
+  int cx = height - offset - (1 + btBarW) * 4 - 3 - 3 - 12;
+  int cy = width - offset - btBarH / 2 - 2;
+  sprite.fillRect(cx - 7, cy - 9, 15, 17, TFT_BLACK);
+  if (!auto_power_off) {
+    return;
+  }
+
+  sprite.drawFastHLine(cx - 2, cy - 8, 5, TFT_WHITE);
+  sprite.drawPixel(cx, cy - 7, TFT_WHITE);
+  sprite.drawCircle(cx, cy, 6, TFT_WHITE);
+  sprite.drawFastVLine(cx, cy - 4, 5, TFT_WHITE);
+  sprite.drawFastHLine(cx, cy, 4, TFT_WHITE);
+}
+
+void Display::update(void) {
+  drawAutoPowerOffIcon();
+  sprite.pushSprite(0, 0);
+}
 
 ShutterMode Display::toggleMode(void) {
   auto next = static_cast<uint8_t>(mode) + 1;
   if (next >= static_cast<uint8_t>(ShutterMode::MAX)) next = 0;
   mode = static_cast<ShutterMode>(next);
 
-  prefs.putUChar("mode", next);
+  prefs.putUChar(pref_mode_key.c_str(), next);
 
   return mode;
 }
@@ -119,3 +145,11 @@ std::string Display::getModeName(void) {
       return "unexpected!";
   }
 }
+
+bool Display::toggleAutoPowerOff(void) {
+  auto_power_off = !auto_power_off;
+  prefs.putBool(pref_auto_poff_key.c_str(), auto_power_off);
+  return auto_power_off;
+}
+
+bool Display::getAutoPowerOff(void) { return auto_power_off; }
