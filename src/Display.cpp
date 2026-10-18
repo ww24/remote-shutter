@@ -63,7 +63,12 @@ void Display::battery(float voltage, int32_t current, int32_t percentage) {
   sprite.setTextSize(1);
   sprite.setTextColor(sprite.color565(180, 180, 180));
   sprite.setCursor(offset, width - offset - 8);
+#if defined(M5_STICK_S3)
+  (void)current;
+  sprite.printf("Bat: V/%.3fv", voltage);
+#else
   sprite.printf("Bat: V/%.3fv I/%dma", voltage, current);
+#endif
 
   uint16_t btColor;
   if (percentage > 50)
