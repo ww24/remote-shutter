@@ -24,15 +24,43 @@ constexpr uint32_t BATTERY_INIT_TIMEOUT_MS = 1000;
 // readings below this voltage are treated as invalid (PMIC not ready)
 constexpr int16_t BATTERY_MIN_VALID_MV = 2500;
 
+// display brightness settings
+constexpr uint8_t BRIGHTNESS_ACTIVE = 128;
+#if defined(M5_STICK_S3)
+constexpr uint8_t BRIGHTNESS_DIM = 8;
+#else
+constexpr uint8_t BRIGHTNESS_DIM = 64;
+#endif
+constexpr uint32_t BRIGHTNESS_DIM_TIMEOUT_MS = 10 * 1000;
+
 // redraw the screen only when something has changed
 bool screen_dirty = true;
 bool last_connected = false;
+
+uint32_t brightness_active_ms = 0;
+bool display_dimmed = false;
 
 uint32_t last_battery_read_ms = 0;
 uint32_t battery_read_interval_ms = 0;  // 0: read on the next call
 int16_t last_battery_mv = -1;
 int32_t last_battery_ma = 0;
 int32_t last_battery_level = -1;
+
+void activateBrightness(uint32_t now) {
+  brightness_active_ms = now;
+  if (display_dimmed) {
+    M5.Display.setBrightness(BRIGHTNESS_ACTIVE);
+    display_dimmed = false;
+  }
+}
+
+void updateBrightness(uint32_t now) {
+  if (!display_dimmed &&
+      now - brightness_active_ms >= BRIGHTNESS_DIM_TIMEOUT_MS) {
+    M5.Display.setBrightness(BRIGHTNESS_DIM);
+    display_dimmed = true;
+  }
+}
 
 // read battery status periodically and update the footer if changed.
 // returns true if a valid reading was obtained.
@@ -91,7 +119,7 @@ void setup() {
 
   M5.Speaker.begin();
   M5.Speaker.setVolume(192);
-  M5.Display.setBrightness(128);
+  M5.Display.setBrightness(BRIGHTNESS_ACTIVE);
   M5.Display.setRotation(3);
 
   display.begin();
@@ -124,32 +152,22 @@ void setup() {
   });
   rs.setOnDisconnect([] { Serial.println("disconnected"); });
   rs.begin();
+
+  brightness_active_ms = millis();
 }
 
 void loop() {
+  uint32_t now = millis();
   bool connected = rs.isConnected();
   if (connected != last_connected) {
     last_connected = connected;
+    activateBrightness(now);
     screen_dirty = true;
   }
 
-  if (connected) {
-    if (M5.BtnA.wasReleased()) {
-      Serial.println("Shutter button was released");
-      rs.stopShutter(millis());
-    }
-
-    if (M5.BtnA.wasPressed()) {
-      Serial.println("Shutter button was pressed");
-      rs.releaseShutter(millis());
-
-    } else if (!M5.BtnA.isPressed() && rs.lastSentDuration(millis()) > 5000) {
-      // about 5 seconds after from last sent
-
-      Serial.println("Keep display on");
-      rs.keepDisplayOn(millis());
-
-    } else if (M5.BtnB.wasPressed()) {
+  if (M5.BtnB.wasPressed()) {
+    activateBrightness(now);
+    if (connected) {
       auto shutter_mode = display.toggleMode();
       rs.setShutterMode(shutter_mode);
       Serial.printf("Shutter mode changed: %s\n",
@@ -158,12 +176,31 @@ void loop() {
     }
   }
 
+  if (connected) {
+    if (M5.BtnA.wasReleased()) {
+      Serial.println("Shutter button was released");
+      rs.stopShutter(now);
+    }
+
+    if (M5.BtnA.wasPressed()) {
+      Serial.println("Shutter button was pressed");
+      rs.releaseShutter(now);
+
+    } else if (!M5.BtnA.isPressed() && rs.lastSentDuration(now) > 5000) {
+      // about 5 seconds after from last sent
+
+      Serial.println("Keep display on");
+      rs.keepDisplayOn(now);
+    }
+  }
+
   if (M5.BtnPWR.wasClicked()) {
     Serial.println("Power off");
     M5.Power.powerOff();
   }
 
-  updateBattery(millis());
+  updateBrightness(now);
+  updateBattery(now);
 
   if (screen_dirty) {
     if (connected) {
